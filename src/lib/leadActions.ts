@@ -16,7 +16,7 @@ export async function logActivity(
   type: Database["public"]["Enums"]["activity_type"],
   meta: Record<string, unknown> = {},
 ) {
-  await supabase.from("activities").insert({ workspace_id, lead_id, user_id, type, meta });
+  await supabase.from("activities").insert({ workspace_id, lead_id, user_id, type, meta: meta as never });
 }
 
 /** Complete current action and schedule next one based on lead stage + behavior. */
