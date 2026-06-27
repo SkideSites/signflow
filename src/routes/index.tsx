@@ -1,29 +1,30 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/use-auth";
+import { useWorkspace } from "@/hooks/use-workspace";
+import { AppShell } from "@/components/AppShell";
+import { Dashboard } from "@/features/Dashboard";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
-    ],
-  }),
-  component: Index,
+  head: () => ({ meta: [{ title: "Dashboard — Signflow" }] }),
+  component: IndexPage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function IndexPage() {
+  const { user, loading } = useAuth();
+  const { loading: wsLoading, current } = useWorkspace();
+  if (loading) return <FullScreenLoader />;
+  if (!user) return <Navigate to="/auth" />;
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <AppShell>
+      {wsLoading || !current ? <FullScreenLoader /> : <Dashboard />}
+    </AppShell>
+  );
+}
+
+function FullScreenLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="size-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
     </div>
   );
 }
