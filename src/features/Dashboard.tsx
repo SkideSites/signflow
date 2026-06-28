@@ -258,6 +258,36 @@ export function Dashboard() {
         </div>
       </section>
 
+      {/* Journey to Next Signature */}
+      <section className="elevated-card p-5">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-4">
+          Journey to next signature
+        </div>
+        {journeyTotal === 0 && (journey?.SIGNED ?? 0) === 0 ? (
+          <div className="text-sm text-muted-foreground text-center py-4">
+            Start adding leads to track your journey
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <JourneyBar
+              label="Leads contacted"
+              value={(journey?.CONTACTED ?? 0) + (journey?.REPLIED ?? 0) + (journey?.CALL_BOOKED ?? 0) + (journey?.NEGOTIATING ?? 0) + (journey?.SIGNED ?? 0)}
+              target={targetContacts}
+            />
+            <JourneyBar
+              label="Responses received"
+              value={(journey?.REPLIED ?? 0) + (journey?.CALL_BOOKED ?? 0) + (journey?.NEGOTIATING ?? 0) + (journey?.SIGNED ?? 0)}
+              target={Math.max(5, Math.round(targetContacts / 3))}
+            />
+            <JourneyBar
+              label="Deals closed"
+              value={journey?.SIGNED ?? 0}
+              target={Math.max(1, Math.round(targetContacts / 9))}
+            />
+          </div>
+        )}
+      </section>
+
       <LeadDrawer leadId={openLead} onClose={() => setOpenLead(null)} />
     </div>
   );
@@ -279,5 +309,26 @@ function AlertCard({
       </div>
       <div className="text-xs text-muted-foreground mt-2">{label}</div>
     </button>
+  );
+}
+
+function JourneyBar({ label, value, target }: { label: string; value: number; target: number }) {
+  const safeTarget = Math.max(1, target);
+  const pct = Math.min(100, Math.round((value / safeTarget) * 100));
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs mb-1.5">
+        <span className="text-foreground/90">{label}</span>
+        <span className="tabular-nums text-muted-foreground">
+          {value}/{safeTarget} · {pct}%
+        </span>
+      </div>
+      <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
+        <div
+          className="h-full bg-primary transition-all"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
   );
 }
