@@ -311,3 +311,24 @@ function AlertCard({
     </button>
   );
 }
+
+function JourneyBar({ label, value, target }: { label: string; value: number; target: number }) {
+  const safeTarget = Math.max(1, target);
+  const pct = Math.min(100, Math.round((value / safeTarget) * 100));
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs mb-1.5">
+        <span className="text-foreground/90">{label}</span>
+        <span className="tabular-nums text-muted-foreground">
+          {value}/{safeTarget} · {pct}%
+        </span>
+      </div>
+      <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
+        <div
+          className="h-full bg-primary transition-all"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
