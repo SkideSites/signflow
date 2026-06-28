@@ -258,6 +258,36 @@ export function Dashboard() {
         </div>
       </section>
 
+      {/* Journey to Next Signature */}
+      <section className="elevated-card p-5">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-4">
+          Journey to next signature
+        </div>
+        {journeyTotal === 0 && (journey?.SIGNED ?? 0) === 0 ? (
+          <div className="text-sm text-muted-foreground text-center py-4">
+            Start adding leads to track your journey
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <JourneyBar
+              label="Leads contacted"
+              value={(journey?.CONTACTED ?? 0) + (journey?.REPLIED ?? 0) + (journey?.CALL_BOOKED ?? 0) + (journey?.NEGOTIATING ?? 0) + (journey?.SIGNED ?? 0)}
+              target={targetContacts}
+            />
+            <JourneyBar
+              label="Responses received"
+              value={(journey?.REPLIED ?? 0) + (journey?.CALL_BOOKED ?? 0) + (journey?.NEGOTIATING ?? 0) + (journey?.SIGNED ?? 0)}
+              target={Math.max(5, Math.round(targetContacts / 3))}
+            />
+            <JourneyBar
+              label="Deals closed"
+              value={journey?.SIGNED ?? 0}
+              target={Math.max(1, Math.round(targetContacts / 9))}
+            />
+          </div>
+        )}
+      </section>
+
       <LeadDrawer leadId={openLead} onClose={() => setOpenLead(null)} />
     </div>
   );
