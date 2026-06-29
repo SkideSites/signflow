@@ -28,14 +28,19 @@ export function ManageWorkspaceDialog({
     queryKey: ["ws-members", current?.id],
     enabled: !!current && open,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data: rows } = await supabase
         .from("workspace_members")
-        .select("user_id, role, created_at, profile:profiles(email, display_name)")
+        .select("user_id, role, created_at")
         .eq("workspace_id", current!.id);
-      return (data ?? []) as Array<{
-        user_id: string; role: "owner" | "admin" | "member"; created_at: string;
-        profile: { email: string | null; display_name: string | null } | null;
-      }>;
+      const list = (rows ?? []) as Array<{ user_id: string; role: "owner" | "admin" | "member"; created_at: string }>;
+      const ids = list.map((r) => r.user_id);
+      const profilesById = new Map<string, { email: string | null; display_name: string | null }>();
+      if (ids.length) {
+        const { data: profs } = await supabase
+          .from("profiles").select("id, email, display_name").in("id", ids);
+        (profs ?? []).forEach((p) => profilesById.set(p.id, { email: p.email, display_name: p.display_name }));
+      }
+      return list.map((r) => ({ ...r, profile: profilesById.get(r.user_id) ?? null }));
     },
   });
 

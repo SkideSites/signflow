@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AddLeadRouteImport } from './routes/add-lead'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PipelineRoute = PipelineRouteImport.update({
   id: '/pipeline',
   path: '/pipeline',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/add-lead': typeof AddLeadRoute
   '/auth': typeof AuthRoute
   '/pipeline': typeof PipelineRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/add-lead': typeof AddLeadRoute
   '/auth': typeof AuthRoute
   '/pipeline': typeof PipelineRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/add-lead': typeof AddLeadRoute
   '/auth': typeof AuthRoute
   '/pipeline': typeof PipelineRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/add-lead' | '/auth' | '/pipeline'
+  fullPaths: '/' | '/add-lead' | '/auth' | '/pipeline' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/add-lead' | '/auth' | '/pipeline'
-  id: '__root__' | '/' | '/add-lead' | '/auth' | '/pipeline'
+  to: '/' | '/add-lead' | '/auth' | '/pipeline' | '/settings'
+  id: '__root__' | '/' | '/add-lead' | '/auth' | '/pipeline' | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,10 +76,18 @@ export interface RootRouteChildren {
   AddLeadRoute: typeof AddLeadRoute
   AuthRoute: typeof AuthRoute
   PipelineRoute: typeof PipelineRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pipeline': {
       id: '/pipeline'
       path: '/pipeline'
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   AddLeadRoute: AddLeadRoute,
   AuthRoute: AuthRoute,
   PipelineRoute: PipelineRoute,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
