@@ -1,8 +1,10 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { AppShell } from "@/components/AppShell";
 import { Dashboard } from "@/features/Dashboard";
+import { Onboarding, shouldOnboard } from "@/features/Onboarding";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Dashboard — Signflow" }] }),
@@ -11,12 +13,19 @@ export const Route = createFileRoute("/")({
 
 function IndexPage() {
   const { user, loading } = useAuth();
-  const { loading: wsLoading, current } = useWorkspace();
-  if (loading) return <FullScreenLoader />;
+  const { loading: wsLoading, current, workspaces } = useWorkspace();
+  const [done, setDone] = useState(false);
+
+  if (loading || wsLoading) return <FullScreenLoader />;
   if (!user) return <Navigate to="/auth" />;
+
+  const needsOnboarding = !done && (workspaces.length === 0 || shouldOnboard());
+  if (needsOnboarding) return <Onboarding onDone={() => setDone(true)} />;
+
+  if (!current) return <FullScreenLoader />;
   return (
     <AppShell>
-      {wsLoading || !current ? <FullScreenLoader /> : <Dashboard />}
+      <Dashboard />
     </AppShell>
   );
 }
