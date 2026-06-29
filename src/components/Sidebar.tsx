@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Columns3, Plus, LogOut } from "lucide-react";
+import { LayoutDashboard, Columns3, Plus, LogOut, Settings } from "lucide-react";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,6 +10,7 @@ const nav: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/pipeline", label: "Pipeline", icon: Columns3 },
   { to: "/add-lead", label: "Add Lead", icon: Plus },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
