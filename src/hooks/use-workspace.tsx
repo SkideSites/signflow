@@ -10,6 +10,7 @@ export type Workspace = {
   allow_member_full_visibility: boolean;
   daily_target_contacts: number;
   daily_target_followups: number;
+  invite_code: string | null;
 };
 
 type Ctx = {
