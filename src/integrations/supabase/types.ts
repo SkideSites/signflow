@@ -181,10 +181,13 @@ export type Database = {
       }
       next_actions: {
         Row: {
+          assigned_by: string | null
+          assigned_to: string | null
           completed_at: string | null
           created_at: string
           due_at: string
           id: string
+          label: string | null
           lead_id: string
           priority: number
           type: Database["public"]["Enums"]["action_type"]
@@ -192,10 +195,13 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          assigned_by?: string | null
+          assigned_to?: string | null
           completed_at?: string | null
           created_at?: string
           due_at?: string
           id?: string
+          label?: string | null
           lead_id: string
           priority?: number
           type: Database["public"]["Enums"]["action_type"]
@@ -203,10 +209,13 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          assigned_by?: string | null
+          assigned_to?: string | null
           completed_at?: string | null
           created_at?: string
           due_at?: string
           id?: string
+          label?: string | null
           lead_id?: string
           priority?: number
           type?: Database["public"]["Enums"]["action_type"]
@@ -257,18 +266,27 @@ export type Database = {
       workspace_members: {
         Row: {
           created_at: string
+          current_focus: string | null
+          last_action_at: string | null
+          last_action_label: string | null
           role: Database["public"]["Enums"]["workspace_role"]
           user_id: string
           workspace_id: string
         }
         Insert: {
           created_at?: string
+          current_focus?: string | null
+          last_action_at?: string | null
+          last_action_label?: string | null
           role?: Database["public"]["Enums"]["workspace_role"]
           user_id: string
           workspace_id: string
         }
         Update: {
           created_at?: string
+          current_focus?: string | null
+          last_action_at?: string | null
+          last_action_label?: string | null
           role?: Database["public"]["Enums"]["workspace_role"]
           user_id?: string
           workspace_id?: string
@@ -290,6 +308,7 @@ export type Database = {
           daily_target_contacts: number
           daily_target_followups: number
           id: string
+          invite_code: string | null
           name: string
           owner_id: string
           type: Database["public"]["Enums"]["workspace_type"]
@@ -300,6 +319,7 @@ export type Database = {
           daily_target_contacts?: number
           daily_target_followups?: number
           id?: string
+          invite_code?: string | null
           name: string
           owner_id: string
           type?: Database["public"]["Enums"]["workspace_type"]
@@ -310,6 +330,7 @@ export type Database = {
           daily_target_contacts?: number
           daily_target_followups?: number
           id?: string
+          invite_code?: string | null
           name?: string
           owner_id?: string
           type?: Database["public"]["Enums"]["workspace_type"]
@@ -330,6 +351,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      generate_invite_code: { Args: never; Returns: string }
       is_workspace_member: {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
