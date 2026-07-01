@@ -162,6 +162,8 @@ export function LeadDrawer({ leadId, onClose }: Props) {
                 )}
               </div>
 
+              <AiDmPanel lead={lead} />
+
               <div>
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Notes</label>
                 <Textarea
