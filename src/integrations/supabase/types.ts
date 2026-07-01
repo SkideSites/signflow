@@ -352,6 +352,10 @@ export type Database = {
         Returns: boolean
       }
       generate_invite_code: { Args: never; Returns: string }
+      get_workspace_invite_code: {
+        Args: { _workspace_id: string }
+        Returns: string
+      }
       is_workspace_member: {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
