@@ -359,6 +359,23 @@ export function Dashboard() {
   );
 }
 
+function SystemClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(t);
+  }, []);
+  const date = now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+  const time = now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return (
+    <div className="flex items-center justify-center gap-2 text-[11px] text-muted-foreground tabular-nums">
+      <span>{date}</span>
+      <span className="opacity-40">·</span>
+      <span>{time}</span>
+    </div>
+  );
+}
+
 function HintOnce({ id, children }: { id: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(!hasSeen(id));
   if (hasSeen(id) && !open) return null;
