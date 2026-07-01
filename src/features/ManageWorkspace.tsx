@@ -121,7 +121,7 @@ export function ManageWorkspaceDialog({
 
   if (!current) return null;
 
-  const code = current.invite_code ?? "";
+  const code = inviteCodeData ?? "";
   const link = typeof window !== "undefined"
     ? `${window.location.origin}/?join=${code}`
     : `/?join=${code}`;
