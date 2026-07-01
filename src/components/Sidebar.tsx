@@ -28,9 +28,12 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-64 shrink-0 bg-sidebar border-r border-sidebar-border h-screen sticky top-0">
-      <div className="px-3 pt-3 pb-2 flex items-center gap-2">
+      <div className="px-3 pt-3 pb-2 flex items-center gap-2.5">
         <img src={iconUrl} alt="Signflow" width={28} height={28} className="rounded-md" />
-        <span className="font-semibold tracking-tight">Signflow</span>
+        <div className="min-w-0">
+          <div className="font-semibold tracking-tight leading-tight">Signflow</div>
+          <div className="text-[10px] text-muted-foreground leading-tight">Daily execution for closing deals</div>
+        </div>
       </div>
       <div className="px-3 pt-2 pb-3">
         <WorkspaceSwitcher />
