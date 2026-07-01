@@ -104,6 +104,7 @@ export function ManageWorkspaceDialog({
     try {
       await regen({ data: { workspaceId: current.id } });
       await refresh();
+      qc.invalidateQueries({ queryKey: ["ws-invite-code", current.id] });
       toast.success("New invite code generated");
     } catch (e) {
       toast.error((e as Error).message);
