@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ScriptsRouteImport } from './routes/scripts'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AddLeadRouteImport } from './routes/add-lead'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScriptsRoute = ScriptsRouteImport.update({
+  id: '/scripts',
+  path: '/scripts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PipelineRoute = PipelineRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/add-lead': typeof AddLeadRoute
   '/auth': typeof AuthRoute
   '/pipeline': typeof PipelineRoute
+  '/scripts': typeof ScriptsRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/add-lead': typeof AddLeadRoute
   '/auth': typeof AuthRoute
   '/pipeline': typeof PipelineRoute
+  '/scripts': typeof ScriptsRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,28 @@ export interface FileRoutesById {
   '/add-lead': typeof AddLeadRoute
   '/auth': typeof AuthRoute
   '/pipeline': typeof PipelineRoute
+  '/scripts': typeof ScriptsRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/add-lead' | '/auth' | '/pipeline' | '/settings'
+  fullPaths:
+    | '/'
+    | '/add-lead'
+    | '/auth'
+    | '/pipeline'
+    | '/scripts'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/add-lead' | '/auth' | '/pipeline' | '/settings'
-  id: '__root__' | '/' | '/add-lead' | '/auth' | '/pipeline' | '/settings'
+  to: '/' | '/add-lead' | '/auth' | '/pipeline' | '/scripts' | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/add-lead'
+    | '/auth'
+    | '/pipeline'
+    | '/scripts'
+    | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +98,7 @@ export interface RootRouteChildren {
   AddLeadRoute: typeof AddLeadRoute
   AuthRoute: typeof AuthRoute
   PipelineRoute: typeof PipelineRoute
+  ScriptsRoute: typeof ScriptsRoute
   SettingsRoute: typeof SettingsRoute
 }
 
@@ -86,6 +109,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scripts': {
+      id: '/scripts'
+      path: '/scripts'
+      fullPath: '/scripts'
+      preLoaderRoute: typeof ScriptsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pipeline': {
@@ -124,6 +154,7 @@ const rootRouteChildren: RootRouteChildren = {
   AddLeadRoute: AddLeadRoute,
   AuthRoute: AuthRoute,
   PipelineRoute: PipelineRoute,
+  ScriptsRoute: ScriptsRoute,
   SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
