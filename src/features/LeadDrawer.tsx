@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Sparkles, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { STAGES, STAGE_LABELS, formatFollowers, timeAgo } from "@/lib/format";
 import { changeStage, markReplied } from "@/lib/leadActions";
 import type { Lead, Activity, Stage } from "@/lib/leadActions";
+import { generateDm } from "@/lib/ai.functions";
 import { toast } from "sonner";
 
 type Props = { leadId: string | null; onClose: () => void };
@@ -159,6 +162,8 @@ export function LeadDrawer({ leadId, onClose }: Props) {
                 )}
               </div>
 
+              <AiDmPanel lead={lead} />
+
               <div>
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Notes</label>
                 <Textarea
@@ -194,5 +199,84 @@ export function LeadDrawer({ leadId, onClose }: Props) {
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function AiDmPanel({ lead }: { lead: Lead }) {
+  const gen = useServerFn(generateDm);
+  const [busy, setBusy] = useState(false);
+  const [primary, setPrimary] = useState<string>("");
+  const [alt, setAlt] = useState<string>("");
+
+  const stateFor = (s: Lead["stage"]): "NEW" | "CONTACTED" | "WAITING_RESPONSE" | "COOLING" | "STUCK" => {
+    if (s === "TO_CONTACT") return "NEW";
+    if (s === "CONTACTED") return "WAITING_RESPONSE";
+    if (s === "REPLIED" || s === "CALL_BOOKED" || s === "NEGOTIATING") return "CONTACTED";
+    return "STUCK";
+  };
+
+  const run = async () => {
+    setBusy(true);
+    setPrimary(""); setAlt("");
+    try {
+      const res = await gen({
+        data: {
+          handle: lead.handle,
+          platform: lead.platform,
+          followers: lead.followers ?? 0,
+          niche: lead.niche ?? null,
+          state: stateFor(lead.stage),
+          goal: "reply",
+        },
+      });
+      setPrimary(res.primary);
+      setAlt(res.alternative);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied");
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          Next best message
+        </label>
+        <Button size="sm" variant="ghost" onClick={run} disabled={busy}>
+          <Sparkles className="size-4" /> {busy ? "Writing…" : primary ? "Regenerate" : "Suggest"}
+        </Button>
+      </div>
+      {(primary || alt) && (
+        <div className="space-y-2">
+          {[
+            { label: "Primary", text: primary },
+            { label: "Alternative", text: alt },
+          ].filter((x) => x.text).map((x) => (
+            <button
+              key={x.label}
+              onClick={() => copy(x.text)}
+              className="w-full text-left p-3 rounded-md bg-surface border border-border hover:bg-surface-hover transition"
+            >
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 flex items-center justify-between">
+                <span>{x.label}</span>
+                <Copy className="size-3" />
+              </div>
+              <div className="text-sm">{x.text}</div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

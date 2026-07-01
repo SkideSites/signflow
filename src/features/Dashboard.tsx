@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/use-workspace";
@@ -179,6 +179,7 @@ export function Dashboard() {
 
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-3xl mx-auto space-y-10 relative">
+      <SystemClock />
       {/* 1. Execution Score */}
       <section className="text-center space-y-3">
         <div className="flex items-center justify-center gap-1.5">
@@ -354,6 +355,23 @@ export function Dashboard() {
           qc.invalidateQueries();
         }}
       />
+    </div>
+  );
+}
+
+function SystemClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(t);
+  }, []);
+  const date = now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+  const time = now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return (
+    <div className="flex items-center justify-center gap-2 text-[11px] text-muted-foreground tabular-nums">
+      <span>{date}</span>
+      <span className="opacity-40">·</span>
+      <span>{time}</span>
     </div>
   );
 }

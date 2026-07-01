@@ -48,10 +48,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }
     const { data } = await supabase
       .from("workspaces")
-      .select("*")
+      .select("id,name,type,owner_id,allow_member_full_visibility,daily_target_contacts,daily_target_followups")
       .order("type", { ascending: true })
       .order("created_at", { ascending: true });
-    const list = (data ?? []) as Workspace[];
+    const list = ((data ?? []) as Array<Omit<Workspace, "invite_code">>).map((w) => ({
+      ...w,
+      invite_code: null,
+    })) as Workspace[];
     setWorkspaces(list);
     const stored = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
     const valid = stored && list.find((w) => w.id === stored);

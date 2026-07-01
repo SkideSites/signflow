@@ -34,6 +34,17 @@ export function ManageWorkspaceDialog({
   const invite = useServerFn(inviteMember);
   const regen = useServerFn(regenerateInviteCode);
 
+  const { data: inviteCodeData } = useQuery({
+    queryKey: ["ws-invite-code", current?.id],
+    enabled: !!current && open,
+    queryFn: async () => {
+      const { data } = await supabase.rpc("get_workspace_invite_code", {
+        _workspace_id: current!.id,
+      });
+      return (data as string | null) ?? "";
+    },
+  });
+
   const { data: members = [] } = useQuery({
     queryKey: ["ws-members", current?.id],
     enabled: !!current && open,
@@ -93,6 +104,7 @@ export function ManageWorkspaceDialog({
     try {
       await regen({ data: { workspaceId: current.id } });
       await refresh();
+      qc.invalidateQueries({ queryKey: ["ws-invite-code", current.id] });
       toast.success("New invite code generated");
     } catch (e) {
       toast.error((e as Error).message);
@@ -110,7 +122,7 @@ export function ManageWorkspaceDialog({
 
   if (!current) return null;
 
-  const code = current.invite_code ?? "";
+  const code = inviteCodeData ?? "";
   const link = typeof window !== "undefined"
     ? `${window.location.origin}/?join=${code}`
     : `/?join=${code}`;
