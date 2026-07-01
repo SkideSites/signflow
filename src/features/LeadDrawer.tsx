@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Sparkles, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { STAGES, STAGE_LABELS, formatFollowers, timeAgo } from "@/lib/format";
 import { changeStage, markReplied } from "@/lib/leadActions";
 import type { Lead, Activity, Stage } from "@/lib/leadActions";
+import { generateDm } from "@/lib/ai.functions";
 import { toast } from "sonner";
 
 type Props = { leadId: string | null; onClose: () => void };
