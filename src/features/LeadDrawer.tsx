@@ -201,3 +201,82 @@ export function LeadDrawer({ leadId, onClose }: Props) {
     </Sheet>
   );
 }
+
+function AiDmPanel({ lead }: { lead: Lead }) {
+  const gen = useServerFn(generateDm);
+  const [busy, setBusy] = useState(false);
+  const [primary, setPrimary] = useState<string>("");
+  const [alt, setAlt] = useState<string>("");
+
+  const stateFor = (s: Lead["stage"]): "NEW" | "CONTACTED" | "WAITING_RESPONSE" | "COOLING" | "STUCK" => {
+    if (s === "TO_CONTACT") return "NEW";
+    if (s === "CONTACTED") return "WAITING_RESPONSE";
+    if (s === "REPLIED" || s === "CALL_BOOKED" || s === "NEGOTIATING") return "CONTACTED";
+    return "STUCK";
+  };
+
+  const run = async () => {
+    setBusy(true);
+    setPrimary(""); setAlt("");
+    try {
+      const res = await gen({
+        data: {
+          handle: lead.handle,
+          platform: lead.platform,
+          followers: lead.followers ?? 0,
+          niche: lead.niche ?? null,
+          state: stateFor(lead.stage),
+          goal: "reply",
+        },
+      });
+      setPrimary(res.primary);
+      setAlt(res.alternative);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied");
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          Next best message
+        </label>
+        <Button size="sm" variant="ghost" onClick={run} disabled={busy}>
+          <Sparkles className="size-4" /> {busy ? "Writing…" : primary ? "Regenerate" : "Suggest"}
+        </Button>
+      </div>
+      {(primary || alt) && (
+        <div className="space-y-2">
+          {[
+            { label: "Primary", text: primary },
+            { label: "Alternative", text: alt },
+          ].filter((x) => x.text).map((x) => (
+            <button
+              key={x.label}
+              onClick={() => copy(x.text)}
+              className="w-full text-left p-3 rounded-md bg-surface border border-border hover:bg-surface-hover transition"
+            >
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 flex items-center justify-between">
+                <span>{x.label}</span>
+                <Copy className="size-3" />
+              </div>
+              <div className="text-sm">{x.text}</div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
